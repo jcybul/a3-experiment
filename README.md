@@ -14,6 +14,16 @@ The main goals for you are to a) test three competing visualizations, b) impleme
 For this assignment you should aim to write everything from scratch. For experimentation it is often necessary to control all elements of the chart.
 You should definitely *reference* demo programs from books or the web, and if you do please provide a References section with links at the end of your Readme.
 
+Going Beyond Cleveland-McGill
+---
+
+Several have expressed interest in conducting surveys of various sorts. I encourage you go move beyond Cleveland and McGill if you can think of other interesting visualization experiment designs and corresponding analyses. 
+
+You might study how people interpret COVID visualizations, for example.
+If you decide to go in a custom route, simply contact staff so we can help you set acceptable parameters.
+Basically, we still want you to do a multi-trial study with each participant, to raise the chance that you get solid results.
+How you measure "error" and similar facets also matter. But you can't go wrong with finding a visualization study online to start from :)
+
 Requirements
 ---
 
