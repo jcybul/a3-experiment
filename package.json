@@ -1,0 +1,13 @@
+{
+    "name": "a3-experiment",
+    "version": "1.0.0",
+    "description": "",
+    "author": "team-name",
+    "scripts": {
+      "start": "node src/app.js"
+    },
+    "dependencies": {
+      "mime": "^2.4.4"
+    }
+  }
+  
