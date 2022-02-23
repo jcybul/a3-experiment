@@ -7,9 +7,6 @@ const defaultPort = 3000;
 
 
 function saveResultsData(data, res) {
-
-
-
     res.writeHead(200, "OK");
     res.end("Data saved");
 }
