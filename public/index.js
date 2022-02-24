@@ -27,6 +27,8 @@ function submitAnswer(event) {
         questionNumber,
         correctAnswer,
     });
+
+    buildNextGraph();
 }
 
 window.onload = function() {
@@ -45,6 +47,16 @@ function buildBarGraph(svg) {
     function getRandomInt(){
         return Math.floor(Math.random() * 100);
     }
+
+    var tempA = Math.floor(Math.random() * 4);
+    var tempB = Math.floor(Math.random() * 4);
+    if (tempA == tempB){
+        tempB = ((tempB + 1) % 4);
+    }
+    if (genData[tempA] >= genData[tempB]){
+        
+    }
+    console.log(tempA + " " + tempB);
 
     var margin = {top: 25, right: 25, bottom: 25, left: 25},
         width = 300 - margin.left - margin.right,
@@ -85,12 +97,8 @@ function buildBarGraph(svg) {
 
 }
 
-function buildBubbleGraph(svg) {
-    
-}
-
 function buildAreaGraph(svg) {
-    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    var margin = {top: 25, right: 25, bottom: 25, left: 25},
     width = 300 - margin.left - margin.right,
     height = 300 - margin.top - margin.bottom;
 
@@ -103,6 +111,22 @@ function buildAreaGraph(svg) {
     //     .attr("transform",
     //         "translate(" + margin.left + "," + margin.top + ")");
 
+    // Generate random data
+    const nSamples = 10;
+    const data = [];
+
+    for (let i = 0; i < nSamples; i++) {
+        for (const series of ["seriesA", "seriesB"]) {
+            data.append({
+                year: i,
+                height: Math.random(),
+                name: series,
+                
+            });
+        }
+    }
+
+    
     //Read the data
     d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered.csv", function(data) {
 
@@ -163,17 +187,33 @@ function buildBubbleGraph(svg) {
     width = 300- margin.left - margin.right,
     height = 300- margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
-    var svg = d3.select("#my_dataviz")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform",
-        "translate(" + margin.left + "," + margin.top + ")");
+    // // append the svg object to the body of the page
+    // var svg = d3.select("#my_dataviz")
+    // .append("svg")
+    // .attr("width", width + margin.left + margin.right)
+    // .attr("height", height + margin.top + margin.bottom)
+    // .append("g")
+    // .attr("transform",
+    //     "translate(" + margin.left + "," + margin.top + ")");
 
-    //Read the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv", function(data) {
+
+    function getRandomInt(i){
+        return Math.floor(Math.random() * i);
+    }
+
+    data = []
+
+    for (let i = 0; i < 8; i++) {
+
+      temp = {
+        "x": getRandomInt(20),
+        "y": getRandomInt(20),
+        "size": getRandomInt(7)
+      }
+     data[i] = temp
+    }
+
+    console.log(data)
 
     // Add X axis
     var x = d3.scaleLinear()
@@ -196,12 +236,10 @@ function buildBubbleGraph(svg) {
     .data(data)
     .enter()
     .append("circle")
-    .attr("cx", function (d) { return x(d.GrLivArea); } )
-    .attr("cy", function (d) { return y(d.SalePrice); } )
-    .attr("r", 1.5)
+    .attr("cx", function (d) { return x(d.x); } )
+    .attr("cy", function (d) { return y(d.y); } )
+    .attr("r", function (d) { return 1*(d.size)})
     .style("fill", "#69b3a2")
-
-    })
     
 }
 
@@ -217,6 +255,7 @@ function buildNextGraph() {
     console.log(`Building new ${name} graph!`);
     
     // Clear previous graph (if any) and add new svg
+    d3.select('#graphContainer').html("");
     const svg = d3.select('#graphContainer').append("svg");
     
     // Build new graph in container and get the correct answer after it has been randomly generated

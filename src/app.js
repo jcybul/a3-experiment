@@ -4,11 +4,51 @@ const mime = require('mime');
 
 
 const defaultPort = 3000;
+const dataFile = "public/data.csv";
 
+
+function extractCSVLine(data, columns) {
+    let ret = "";
+    for (const column of columns) {
+        if (!data.hasOwnProperty(column)) {
+            ret += "?,";
+            continue;
+        }
+
+        const field = data[column];
+        if (Number.isInteger(field) || (typeof field === "string" && /^\d+$/.test(field))) {
+            ret += `${field},`;
+        } else {
+            ret += `"${field}",`;
+        }
+    }
+
+    return ret;
+}
 
 function saveResultsData(data, res) {
-    res.writeHead(200, "OK");
-    res.end("Data saved");
+    const columns = ["userId", "questionNumber", "graphType", "timestamp", "correctAnswer", "answer"];
+
+    if (!fs.existsSync(dataFile)) {
+        console.log("Data file does not exist yet, creating a new file");
+        // Create file and add csv header to label columns
+        const headerLine = columns.map(x => `"${x}"`).join(",") + ",\n";
+        fs.writeFileSync(dataFile, headerLine);
+    }
+
+    // Use the simple approach of just dumping everything in a csv then sorting through it later
+    const csvLine = extractCSVLine(data, columns);
+    console.log(`Received data line "${csvLine}" from message ${JSON.stringify(data)}`);
+    fs.appendFile(dataFile, csvLine + "\n", function (err) {
+        if (err) {
+            console.log(`An error occured while appending the csv file: ${err.message}`);
+            res.writeHead(500, "Internal Server Error");
+            res.end(err.message);
+        } else {
+            res.writeHead(200, "OK");
+            res.end("Data saved");
+        }
+    });
 }
 
 
