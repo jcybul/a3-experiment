@@ -89,9 +89,126 @@ function buildBubbleGraph(svg) {
     
 }
 
+function buildAreaGraph(svg) {
+    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 300 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    // var svg = d3.select("#graphContainer")
+    // .append("svg")
+    //     .attr("width", width + margin.left + margin.right)
+    //     .attr("height", height + margin.top + margin.bottom)
+    // .append("g")
+    //     .attr("transform",
+    //         "translate(" + margin.left + "," + margin.top + ")");
+
+    //Read the data
+    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered.csv", function(data) {
+
+    // group the data: one array for each value of the X axis.
+    var sumstat = d3.nest()
+        .key(function(d) { return d.year;})
+        .entries(data);
+
+    // Stack the data: each group will be represented on top of each other
+    var mygroups = ["Helen", "Amanda", "Ashley"] // list of group names
+    var mygroup = [1,2,3] // list of group names
+    var stackedData = d3.stack()
+        .keys(mygroup)
+        .value(function(d, key){
+        return d.values[key].n
+        })
+        (sumstat)
+
+    // Add X axis --> it is a date format
+    var x = d3.scaleLinear()
+        .domain(d3.extent(data, function(d) { return d.year; }))
+        .range([ 0, width ]);
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(5));
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) { return +d.n; })*1.2])
+        .range([ height, 0 ]);
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    // color palette
+    var color = d3.scaleOrdinal()
+        .domain(mygroups)
+        .range(['#F2F2F2','#BDBDBD','#080808'])
+
+    // Show the areas
+    svg
+        .selectAll("mylayers")
+        .data(stackedData)
+        .enter()
+        .append("path")
+        .style("fill", function(d) { name = mygroups[d.key-1] ;  return color(name); })
+        .attr("d", d3.area()
+            .x(function(d, i) { return x(d.data.key); })
+            .y0(function(d) { return y(d[0]); })
+            .y1(function(d) { return y(d[1]); })
+        )
+
+})
+}
+
+function buildBubbleGraph(svg) {
+        // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 300- margin.left - margin.right,
+    height = 300- margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+    //Read the data
+    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv", function(data) {
+
+    // Add X axis
+    var x = d3.scaleLinear()
+    .domain([0, 4000])
+    .range([ 0, width ]);
+    svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+    .domain([0, 500000])
+    .range([ height, 0]);
+    svg.append("g")
+    .call(d3.axisLeft(y));
+
+    // Add dots
+    svg.append('g')
+    .selectAll("dot")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", function (d) { return x(d.GrLivArea); } )
+    .attr("cy", function (d) { return y(d.SalePrice); } )
+    .attr("r", 1.5)
+    .style("fill", "#69b3a2")
+
+    })
+    
+}
+
 function buildNextGraph() {
     const graphBuilders = [
         ["bar", buildBarGraph],
+        ["area", buildAreaGraph],
         ["bubble", buildBubbleGraph],
     ];
     
