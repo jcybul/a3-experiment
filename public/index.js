@@ -206,7 +206,7 @@ function buildBarGraph(svg,flag) {
 
     var difference = genData[tempB] / genData[tempA];
     var actDifference = Math.floor(difference * 100);
-    console.log("A%B: " + actDifference);
+    // console.log("A%B: " + actDifference);
 
     if(flag){
         svg.append("text")
@@ -327,7 +327,7 @@ function buildAreaGraph(svg,flag) {
 
     var difference = B / A;
     var actDifference = Math.floor(difference * 100);
-    console.log("A%B: " + actDifference);
+    // console.log("A%B: " + actDifference);
 
     if(flag){
         svg.append("text")
@@ -487,7 +487,7 @@ function buildBubbleGraph(svg,flag) {
 
     var difference = B / A;
     var actDifference = Math.floor(difference * 100);
-    console.log("A%B: " + actDifference);
+    // console.log("A%B: " + actDifference);
     
     if(flag){
         svg.append("text")
