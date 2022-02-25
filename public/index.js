@@ -91,10 +91,10 @@ function submitAnswer(event) {
             navigator.clipboard.writeText(copyText);
         })
         d3.select('#graphContainer').html("");
-        feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
+        feedback.innerHTML = `<b>Thank you for participating! Your total score was ${numberCorrect}/60<b>`;
         questionNumber++;
     } else {
-        feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
+        feedback.innerHTML = `<b>Thank you for participating! Your total score was ${numberCorrect}/60<b>`;
     }
     
 }
