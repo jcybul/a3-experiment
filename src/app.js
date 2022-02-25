@@ -1,12 +1,19 @@
-const http = require('http');
+const express = require("express");
+const bodyParser = require("body-parser");
 const fs = require('fs');
-const mime = require('mime');
-const sanitize = require('sanitize-filename');
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+app.use(express.static("public"));
+app.get("/", (_, res) => res.redirect("/index.html"));
+
+app.post("/api/results", (req, res) => saveResultsData(req.body, res));
 
 
-const defaultPort = 3000;
 const dataFile = "public/data.csv";
-
 
 function extractCSVLine(data, columns) {
     let ret = "";
@@ -42,7 +49,7 @@ function saveResultsData(data, res) {
     console.log(`Received data line "${csvLine}" from message ${JSON.stringify(data)}`);
     fs.appendFile(dataFile, csvLine + "\n", function (err) {
         if (err) {
-            console.log(`An error occured while appending the csv file: ${err.message}`);
+            console.log(`An error occurred while appending the csv file: ${err.message}`);
             res.writeHead(500, "Internal Server Error");
             res.end(err.message);
         } else {
@@ -52,56 +59,4 @@ function saveResultsData(data, res) {
     });
 }
 
-
-function waitForData(req, callback) {
-    let buffer = "";
-    req.on('data', data => buffer += data)
-    req.on('end', () => callback(buffer))
-}
-
-function sendFile(response, filename) {
-    const type = mime.getType(filename)
-
-    fs.readFile(filename, function (err, content) {
-
-        // if the error = null, then we've loaded the file successfully
-        if (err === null) {
-            response.writeHeader(200, {'Content-Type': type})
-            response.end(content)
-
-        } else {
-            // file not found, error code 404
-            response.writeHeader(404)
-            response.end('404 Error: File Not Found')
-        }
-    })
-}
-
-
-function handleRequest(req, res) {
-    console.log(`${req.method}: ${req.url}`);
-
-    // Handle static file serving, but probably won't be needed since we are using github pages
-    // Could also be used to fetch the results from the server
-    if (req.method === "GET") {
-        if (req.url === '/') {
-            return sendFile(res, 'public/index.html');
-        } else {
-            return sendFile(res, "public/" + sanitize(req.url));
-        }
-    }
-
-    // Handle new data being sent to the server
-    if (req.method === "POST" && req.url.startsWith("/api/results")) {
-        return waitForData(req, data => saveResultsData(data, res));
-    }
-
-    // Default to bad request message
-    response.writeHead(400, "Bad Request");
-    response.end("Unknown route: " + req.method + ": " + req.url);
-}
-
-
-
-const server = http.createServer(handleRequest);
-server.listen(process.env.PORT || defaultPort);
+module.exports = app;
