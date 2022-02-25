@@ -15,6 +15,7 @@ function sendResults(data) {
     .then(console.log);
 }
 
+
 function submitAnswer(event) {
     if (event) {
         event.preventDefault();
@@ -24,6 +25,7 @@ function submitAnswer(event) {
     const feedback = document.getElementById("feedback");
     const location = document.getElementById("location");
     const share = document.createElement("button");
+    
 
     if (textField.value === "") {
         feedback.innerHTML = "<b>\u{1f615}</b> You need to enter a value";
@@ -50,32 +52,33 @@ function submitAnswer(event) {
 
     if (questionNumber >= 2 && questionNumber < 63) {
         location.innerHTML = `<b>${questionNumber-2}/60<b>`;
-    }
     
-    if (!Number.isInteger(correctAnswer)) {
-        feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
-    } else if (userId % 2 == 0) {
-        const err = Math.abs(correctAnswer - answer);
+        if (!Number.isInteger(correctAnswer)) {
+            feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
+        } else if (userId % 2 == 0) {
+            const err = Math.abs(correctAnswer - answer);
 
-        if (err < 10) {
-            feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
-            numberCorrect +=1;
+            if (err < 10) {
+                feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
+                numberCorrect +=1;
+            } else {
+                feedback.innerHTML = `<b>\u2639 You were ${err}% away from the correct answer of ${correctAnswer}%<b>`;
+            }
         } else {
-            feedback.innerHTML = `<b>\u2639 You were ${err}% away from the correct answer of ${correctAnswer}%<b>`;
-        }
-    } else {
-        const err = Math.abs(correctAnswer - answer);
+            const err = Math.abs(correctAnswer - answer);
 
-        if (err < 10) {
-            numberCorrect +=1;
-        } 
+            if (err < 10) {
+                numberCorrect +=1;
+            } 
+        }
+    
     }
 
     textField.value = ""; 
 
     if (questionNumber < 63) {
         buildNextGraph();
-    } else {
+    } else if (questionNumber == 63) {
         share.innerHTML = "Share Results!";
         document.body.appendChild(share);
         share.addEventListener("click", function () {
@@ -84,6 +87,9 @@ function submitAnswer(event) {
             navigator.clipboard.writeText(copyText);
         })
         d3.select('#graphContainer').html("");
+        feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
+        questionNumber++;
+    } else {
         feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
     }
     
@@ -190,7 +196,7 @@ function buildBarGraph(svg,flag) {
               case tempB:
                 return "#AAAAAA";
               default:
-                return "#FFFFFF";
+                return "#FFFFFF00";
             }
         })
         .attr('stroke', '#000000');
