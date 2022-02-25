@@ -7,7 +7,7 @@ const regex = /^-----BEGIN CERTIFICATE-----\r?\n((?:(?!-----).*\r?\n)*)-----END 
 
 // This line is from the Node.js HTTPS documentation.
 const options = {
-    key: fs.readFileSync('../cert2/meggitt.dev.pem', 'utf-8'),
+    key: fs.readFileSync('../cert2/meggitt.dev.key', 'utf-8'),
     cert: fs.readFileSync('../cert2/cf120b6b55e88913.crt', 'utf-8'),
     ca: fs.readFileSync('../cert2/gd_bundle-g2-g1.crt', 'utf-8').match(regex),
 };

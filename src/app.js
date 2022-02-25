@@ -1,9 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require('fs');
+const morgan = require("morgan");
 
 const app = express();
 
+app.use(morgan("tiny"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -45,7 +47,7 @@ function saveResultsData(data, res) {
     }
 
     // Use the simple approach of just dumping everything in a csv then sorting through it later
-    const csvLine = extractCSVLine(JSON.parse(data), columns);
+    const csvLine = extractCSVLine(data, columns);
     console.log(`Received data line "${csvLine}" from message ${JSON.stringify(data)}`);
     fs.appendFile(dataFile, csvLine + "\n", function (err) {
         if (err) {

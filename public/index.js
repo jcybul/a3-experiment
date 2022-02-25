@@ -9,6 +9,9 @@ let numberCorrect = 0;
 function sendResults(data) {
     return fetch("/api/results", {
         method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data),
     })
     .then(x => x.body())
