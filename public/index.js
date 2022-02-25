@@ -53,23 +53,25 @@ function submitAnswer(event) {
     if (questionNumber >= 2 && questionNumber < 63) {
         location.innerHTML = `<b>${questionNumber-2}/60<b>`;
     
-        if (!Number.isInteger(correctAnswer)) {
-            feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
-        } else if (userId % 2 == 0) {
-            const err = Math.abs(correctAnswer - answer);
+        if (questionNumber >= 3){
+            if (!Number.isInteger(correctAnswer)) {
+                feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
+            } else if (userId % 2 == 0) {
+                const err = Math.abs(correctAnswer - answer);
 
-            if (err < 10) {
-                feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
-                numberCorrect +=1;
+                if (err < 10) {
+                    feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
+                    numberCorrect +=1;
+                } else {
+                    feedback.innerHTML = `<b>\u2639 You were ${err}% away from the correct answer of ${correctAnswer}%<b>`;
+                }
             } else {
-                feedback.innerHTML = `<b>\u2639 You were ${err}% away from the correct answer of ${correctAnswer}%<b>`;
-            }
-        } else {
-            const err = Math.abs(correctAnswer - answer);
+                const err = Math.abs(correctAnswer - answer);
 
-            if (err < 10) {
-                numberCorrect +=1;
-            } 
+                if (err < 10) {
+                    numberCorrect +=1;
+                } 
+            }
         }
     
     }
@@ -82,9 +84,10 @@ function submitAnswer(event) {
         share.innerHTML = "Share Results!";
         document.body.appendChild(share);
         share.addEventListener("click", function () {
-            console.log("I ran!");
-            var copyText = "I'm so good: " + numberCorrect;
-            navigator.clipboard.writeText(copyText);
+            var copyText = "I guessed " + numberCorrect + "/60 correct! " +
+            "Link: //insertLink!//";
+            // navigator.clipboard.writeText(copyText); //Uncomment if HTTPS works
+            alert(copyText); //
         })
         d3.select('#graphContainer').html("");
         feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
@@ -330,31 +333,37 @@ function buildAreaGraph(svg,flag) {
         svg.append("text")
             .attr("x", 15)
             .attr("y", 210)
+            .style("font-size", "14px")
             .text("Here we have a Stacked Area Graph");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 225)
+            .style("font-size", "14px")
             .text("The larger (dataset) at point X is dark gray");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 240)
+            .style("font-size", "14px")
             .text("The smaller (dataset) at point X is light gray");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 255)
+            .style("font-size", "14px")
             .text("The top color is stacked on the bottom color");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 270)
+            .style("font-size", "14px")
             .text("Y value of light gray at X is " + actDifference + "% of dark gray");
 
         svg.append("text")
             .attr("x", 60)
             .attr("y", 285)
+            .style("font-size", "14px")
             .text("Report " + actDifference + " below:");
     }
     return actDifference;
@@ -484,26 +493,31 @@ function buildBubbleGraph(svg,flag) {
         svg.append("text")
             .attr("x", 30)
             .attr("y", 210)
+            .style("font-size", "14px")
             .text("Here we have a Bubble Graph");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 230)
+            .style("font-size", "14px")
             .text("The dark gray point has a larger Y value/size");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 250)
+            .style("font-size", "14px")
             .text("The light gray point has a smaller Y value/size");
 
         svg.append("text")
             .attr("x", 0)
             .attr("y", 270)
+            .style("font-size", "14px")
             .text("The value of light gray is " + actDifference + "% of the dark gray");
 
         svg.append("text")
             .attr("x", 60)
             .attr("y", 290)
+            .style("font-size", "14px")
             .text("Report " + actDifference + " below:");
     }
     
