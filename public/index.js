@@ -43,14 +43,16 @@ function submitAnswer(event) {
 
     feedback.innerHTML = "";
 
-    sendResults({
-        answer,
-        timestamp: new Date().getTime(),
-        userId,
-        graphType,
-        questionNumber,
-        correctAnswer,
-    });
+    if (questionNumber < 63) {
+        sendResults({
+            answer,
+            timestamp: new Date().getTime(),
+            userId,
+            graphType,
+            questionNumber,
+            correctAnswer,
+        });
+    }
 
     if (questionNumber >= 2 && questionNumber < 63) {
         location.innerHTML = `<b>${questionNumber-2}/60<b>`;
@@ -82,15 +84,17 @@ function submitAnswer(event) {
 
     if (questionNumber < 63) {
         buildNextGraph();
-    } else if (questionNumber == 63) {
-        share.innerHTML = "Share Results!";
+    } else if (questionNumber === 63) {
+        share.innerHTML = "Copy Results!";
         document.body.appendChild(share);
         share.addEventListener("click", function () {
-            var copyText = "I guessed " + numberCorrect + "/60 correct! " +
+            const copyText = "I guessed " + numberCorrect + "/60 correct! " +
             "Link: https://meggitt.dev";
             navigator.clipboard.writeText(copyText);
         })
-        d3.select('#graphContainer').html("");
+        document.getElementById("graphContainer").outerHTML = "";
+        document.getElementById("answer").outerHTML = "";
+        document.getElementById("submit").outerHTML = "";
         feedback.innerHTML = `<b>Thank you for participating! Your total score was ${numberCorrect}/60<b>`;
         questionNumber++;
     } else {
