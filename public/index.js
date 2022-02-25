@@ -85,9 +85,8 @@ function submitAnswer(event) {
         document.body.appendChild(share);
         share.addEventListener("click", function () {
             var copyText = "I guessed " + numberCorrect + "/60 correct! " +
-            "Link: //insertLink!//";
-            // navigator.clipboard.writeText(copyText); //Uncomment if HTTPS works
-            alert(copyText); //
+            "Link: https://meggitt.dev";
+            navigator.clipboard.writeText(copyText);
         })
         d3.select('#graphContainer').html("");
         feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
