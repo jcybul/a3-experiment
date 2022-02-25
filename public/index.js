@@ -23,6 +23,7 @@ function submitAnswer(event) {
     const textField = document.getElementById("answer");
     const feedback = document.getElementById("feedback");
     const location = document.getElementById("location");
+    const share = document.createElement("button");
 
     if (textField.value === "") {
         feedback.innerHTML = "<b>\u{1f615}</b> You need to enter a value";
@@ -35,6 +36,8 @@ function submitAnswer(event) {
         feedback.innerHTML = "Please enter a value within bounds";
         return;
     }
+
+    feedback.innerHTML = "";
 
     sendResults({
         answer,
@@ -73,8 +76,15 @@ function submitAnswer(event) {
     if (questionNumber < 63) {
         buildNextGraph();
     } else {
+        share.innerHTML = "Share Results!";
+        document.body.appendChild(share);
+        share.addEventListener("click", function () {
+            console.log("I ran!");
+            var copyText = "I'm so good: " + numberCorrect;
+            navigator.clipboard.writeText(copyText);
+        })
         d3.select('#graphContainer').html("");
-        feedback.innerHTML = `Thank you for participating! You're total score was ${numberCorrect}/60`;
+        feedback.innerHTML = `<b>Thank you for participating! You're total score was ${numberCorrect}/60<b>`;
     }
     
 }
