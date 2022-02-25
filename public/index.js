@@ -14,7 +14,6 @@ function sendResults(data) {
         },
         body: JSON.stringify(data),
     })
-    .then(x => x.body())
     .then(console.log);
 }
 
@@ -104,7 +103,6 @@ window.onload = function() {
     const submitButton = document.getElementById("submit");
     submitButton.onclick = submitAnswer;
 
-    console.log("Running window.onload!");
     buildNextGraph();
 }
 
