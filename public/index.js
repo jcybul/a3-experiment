@@ -18,9 +18,23 @@ function submitAnswer(event) {
     event.preventDefault();
 
     const textField = document.getElementById("answer");
+    const feedback = document.getElementById("feedback");
+    const location = document.getElementById("location");
+
+    if (textField.value === "") {
+        feedback.innerHTML = "<b>\u{1f615}</b> You need to enter a value";
+        return;
+    }
+
+    const answer = parseInt(textField.value);
+
+    if (answer < 0 || answer > 100) {
+        feedback.innerHTML = "Please enter a value within bounds";
+        return;
+    }
 
     sendResults({
-        answer: textField.value,
+        answer,
         timestamp: new Date().getTime(),
         userId,
         graphType,
@@ -28,6 +42,21 @@ function submitAnswer(event) {
         correctAnswer,
     });
 
+    location.innerHTML = `<b>${questionNumber}/60%<b>`;
+    
+    if (!Number.isInteger(correctAnswer)) {
+        feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
+    } else if (userId % 2 == 0) {
+        const err = Math.abs(correctAnswer - answer);
+
+        if (err < 10) {
+            feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
+        } else {
+            feedback.innerHTML = `<b>\u2639 You were ${err} away from the correct answer of ${correctAnswer}%<b>`;
+        }
+    }
+
+    textField.value = ""; 
     buildNextGraph();
 }
 
@@ -53,10 +82,11 @@ function buildBarGraph(svg) {
     if (tempA == tempB){
         tempB = ((tempB + 1) % 4);
     }
-    if (genData[tempA] >= genData[tempB]){
-        
+    if (genData[tempA] <= genData[tempB]){
+        var tempC = tempA;
+        tempA = tempB;
+        tempB = tempC;
     }
-    console.log(tempA + " " + tempB);
 
     var margin = {top: 25, right: 25, bottom: 25, left: 25},
         width = 300 - margin.left - margin.right,
@@ -67,15 +97,23 @@ function buildBarGraph(svg) {
             
     var x = d3.scaleBand()
         .range([ 0, width ])
-        .domain(genData.map(function(d,i) { return i }))
+        .domain(genData.map(function(d,i) { 
+            if(i ==  tempA){
+                return "A";
+            } else if(i == tempB){
+                return "B";
+            } else {
+                return i+1;
+            } 
+        }))
         .padding(0.2);
         
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x))
+        .call(d3.axisBottom(x).tickFormat(x => /[AB]/.test(x) ? x : ""))
     .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
+        .style("text-anchor", "end")
+        .style("font-weight", "bold");
         
     var y = d3.scaleLinear()
         .domain([0, 100])
@@ -88,13 +126,35 @@ function buildBarGraph(svg) {
         .data(genData)
         .enter()
         .append("rect")
-        .attr("x", function(d,i) { return x(i); })
+        // .attr("x", function(d,i) { return x(i); })
+        .attr("x", function(d,i) { 
+            if(i ==  tempA){
+                return x("A");
+            } else if(i == tempB){
+                return x("B");
+            } else {
+                return x(i+1);
+            }
+        })
         .attr("y", function(d) { return y(d); })
         .attr("width", x.bandwidth())
         .attr("height", function(d) { return height - y(d); })
-        .attr("fill", "#FFFFFF")
+        // .attr("fill", "#FFFFFF")
+        .attr("fill", function (d,i) {
+            switch(i){
+              case tempA:
+                return "#666666";
+              case tempB:
+                return "#AAAAAA";
+              default:
+                return "#FFFFFF";
+            }
+        })
         .attr('stroke', '#000000');
 
+    var difference = genData[tempB] / genData[tempA];
+    console.log("A%B: " + Math.floor(difference * 100));
+    return Math.floor(difference * 100);
 }
 
 function buildAreaGraph(svg) {
@@ -112,36 +172,49 @@ function buildAreaGraph(svg) {
     //         "translate(" + margin.left + "," + margin.top + ")");
 
     // Generate random data
+    
+    var mygroups = ["seriesA", "seriesB"] // list of group names
+    var mygroup = [0,1] // list of group names
     const nSamples = 10;
     const data = [];
 
     for (let i = 0; i < nSamples; i++) {
-        for (const series of ["seriesA", "seriesB"]) {
-            data.append({
+        for (const series of mygroups) {
+            data.push({
                 year: i,
-                height: Math.random(),
+                n: Math.floor(Math.random() * 100),
                 name: series,
-                
             });
         }
     }
 
-    
-    //Read the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered.csv", function(data) {
+    var bottomA = ['#AAAAAAAA','#666666AA', '#333333AA'];
+    var topA = ['#333333AA','#666666AA', '#AAAAAAAA'];
+    var rangeA = [];
 
+    var tempA = data[10].n //5 A
+    var tempB = data[11].n //5 B
+    var A;
+    var B;
+    if (tempA <= tempB){
+        rangeA = topA;
+        A = tempB;
+        B = tempA;
+    } else {
+        rangeA = bottomA;
+        A = tempA;
+        B = tempB;
+    }
+    // Stack the data: each group will be represented on top of each other
     // group the data: one array for each value of the X axis.
     var sumstat = d3.nest()
         .key(function(d) { return d.year;})
         .entries(data);
 
-    // Stack the data: each group will be represented on top of each other
-    var mygroups = ["Helen", "Amanda", "Ashley"] // list of group names
-    var mygroup = [1,2,3] // list of group names
     var stackedData = d3.stack()
         .keys(mygroup)
         .value(function(d, key){
-        return d.values[key].n
+            return d.values[key].n;
         })
         (sumstat)
 
@@ -151,11 +224,11 @@ function buildAreaGraph(svg) {
         .range([ 0, width ]);
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(5));
+        .call(d3.axisBottom(x).ticks(2).tickSize(-height).tickFormat(x => /[5]/.test(x) ? "X" : ""));
 
     // Add Y axis
     var y = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return +d.n; })*1.2])
+        .domain([0, d3.max(data, function(d) { return +d.n; })*2]) // 1.2
         .range([ height, 0 ]);
     svg.append("g")
         .call(d3.axisLeft(y));
@@ -163,7 +236,7 @@ function buildAreaGraph(svg) {
     // color palette
     var color = d3.scaleOrdinal()
         .domain(mygroups)
-        .range(['#F2F2F2','#BDBDBD','#080808'])
+        .range(rangeA)
 
     // Show the areas
     svg
@@ -178,12 +251,15 @@ function buildAreaGraph(svg) {
             .y1(function(d) { return y(d[1]); })
         )
 
-})
+    var difference = B / A;
+    console.log("A%B: " + Math.floor(difference * 100));
+    return Math.floor(difference * 100);
 }
+
 
 function buildBubbleGraph(svg) {
         // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    var margin = {top: 25, right: 25, bottom: 25, left: 25},
     width = 300- margin.left - margin.right,
     height = 300- margin.top - margin.bottom;
 
@@ -198,34 +274,62 @@ function buildBubbleGraph(svg) {
 
 
     function getRandomInt(i){
-        return Math.floor(Math.random() * i);
+        let r = Math.floor(Math.random() * i)
+        if(r < 5){
+            r =+ 5;
+        }
+        return r;
     }
 
     data = []
+    var A;
+    var B;
 
-    for (let i = 0; i < 8; i++) {
-
-      temp = {
-        "x": getRandomInt(20),
-        "y": getRandomInt(20),
-        "size": getRandomInt(7)
-      }
-     data[i] = temp
+    for (let i = 0; i < 12; i++) {
+        if(i == 0){
+            temp = {
+                "xd": getRandomInt(40),
+                "yd": getRandomInt(50),
+                "color": "A"
+            }
+        } else if(i == 1){
+            temp = {
+                "xd": getRandomInt(40),
+                "yd": getRandomInt(50),
+                "color": "A"
+            }
+            if(data[0].yd < temp.yd){
+                data[0].color = "B"
+                A = temp.yd;
+                B = data[0].yd;
+            }
+            else{
+                temp.color ="B"
+                B = temp.yd;
+                A = data[0].yd;
+            }
+        }
+        else{
+            temp = {
+                "xd": getRandomInt(40),
+                "yd": getRandomInt(50),
+                "color": ""
+            }
+        }
+        data[i] = temp
     }
-
-    console.log(data)
 
     // Add X axis
     var x = d3.scaleLinear()
-    .domain([0, 4000])
+    .domain([0, 40])
     .range([ 0, width ]);
     svg.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).ticks(0));
 
     // Add Y axis
     var y = d3.scaleLinear()
-    .domain([0, 500000])
+    .domain([0, 50])
     .range([ height, 0]);
     svg.append("g")
     .call(d3.axisLeft(y));
@@ -236,11 +340,30 @@ function buildBubbleGraph(svg) {
     .data(data)
     .enter()
     .append("circle")
-    .attr("cx", function (d) { return x(d.x); } )
-    .attr("cy", function (d) { return y(d.y); } )
-    .attr("r", function (d) { return 1*(d.size)})
-    .style("fill", "#69b3a2")
-    
+    .attr("cx", function (d) { return x(d.xd); } )
+    .attr("cy", function (d) { return y(d.yd); } )
+    .attr("r", function (d) { return 5+(d.yd*0.2)})
+    .style("line", "black")
+        .attr("fill", function (d) {
+            switch(d.color){
+              case "A":
+                return "#666666";
+              case "B":
+                return "#AAAAAA";
+              default:
+                return "#FFFFFF00";
+            }
+        })
+        .attr('stroke', '#000000')
+        .append('text')
+        .text(d => d.color)
+        .attr('color', 'black')
+        .attr('font-size', 15);
+
+    var difference = B / A;
+    console.log("A%B: " + Math.floor(difference * 100));
+    return Math.floor(difference * 100);
+
 }
 
 function buildNextGraph() {
