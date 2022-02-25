@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const mime = require('mime');
+const sanitize = require('sanitize-filename');
 
 
 const defaultPort = 3000;
@@ -37,7 +38,7 @@ function saveResultsData(data, res) {
     }
 
     // Use the simple approach of just dumping everything in a csv then sorting through it later
-    const csvLine = extractCSVLine(data, columns);
+    const csvLine = extractCSVLine(JSON.parse(data), columns);
     console.log(`Received data line "${csvLine}" from message ${JSON.stringify(data)}`);
     fs.appendFile(dataFile, csvLine + "\n", function (err) {
         if (err) {
@@ -78,13 +79,15 @@ function sendFile(response, filename) {
 
 
 function handleRequest(req, res) {
+    console.log(`${req.method}: ${req.url}`);
+
     // Handle static file serving, but probably won't be needed since we are using github pages
     // Could also be used to fetch the results from the server
     if (req.method === "GET") {
         if (req.url === '/') {
             return sendFile(res, 'public/index.html');
         } else {
-            return sendFile(res, "public" + req.url);
+            return sendFile(res, "public/" + sanitize(req.url));
         }
     }
 

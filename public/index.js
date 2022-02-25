@@ -1,22 +1,25 @@
 
 const userId = Math.floor(1000000000 * Math.random());
 let questionNumber = -1;
+let flag = true;
 let graphType = "n/a";
 let correctAnswer = 0;
+let numberCorrect = 0;
 
 function sendResults(data) {
-    // TODO: Send to correct ip
     return fetch("/api/results", {
         method: "POST",
         body: JSON.stringify(data),
     })
-    .then(x => x.json())
+    .then(x => x.body())
     .then(console.log);
 }
 
 function submitAnswer(event) {
-    event.preventDefault();
-
+    if (event) {
+        event.preventDefault();
+    }
+    
     const textField = document.getElementById("answer");
     const feedback = document.getElementById("feedback");
     const location = document.getElementById("location");
@@ -42,7 +45,9 @@ function submitAnswer(event) {
         correctAnswer,
     });
 
-    location.innerHTML = `<b>${questionNumber}/60%<b>`;
+    if (questionNumber >= 2 && questionNumber < 63) {
+        location.innerHTML = `<b>${questionNumber-2}/60<b>`;
+    }
     
     if (!Number.isInteger(correctAnswer)) {
         feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
@@ -51,13 +56,27 @@ function submitAnswer(event) {
 
         if (err < 10) {
             feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
+            numberCorrect +=1;
         } else {
-            feedback.innerHTML = `<b>\u2639 You were ${err} away from the correct answer of ${correctAnswer}%<b>`;
+            feedback.innerHTML = `<b>\u2639 You were ${err}% away from the correct answer of ${correctAnswer}%<b>`;
         }
+    } else {
+        const err = Math.abs(correctAnswer - answer);
+
+        if (err < 10) {
+            numberCorrect +=1;
+        } 
     }
 
     textField.value = ""; 
-    buildNextGraph();
+
+    if (questionNumber < 63) {
+        buildNextGraph();
+    } else {
+        d3.select('#graphContainer').html("");
+        feedback.innerHTML = `Thank you for participating! You're total score was ${numberCorrect}/60`;
+    }
+    
 }
 
 window.onload = function() {
@@ -68,8 +87,15 @@ window.onload = function() {
     buildNextGraph();
 }
 
+function fixFormEnter(event) {
+    if (event.key === "Enter") {
+        submitAnswer();
+    }
+    
+    return event.key !== "Enter";
+}
 
-function buildBarGraph(svg) {
+function buildBarGraph(svg,flag) {
 
     genData = d3.range(4).map(getRandomInt);
 
@@ -88,12 +114,19 @@ function buildBarGraph(svg) {
         tempB = tempC;
     }
 
-    var margin = {top: 25, right: 25, bottom: 25, left: 25},
-        width = 300 - margin.left - margin.right,
-        height = 300 - margin.top - margin.bottom;
+    if(flag){
+        var margin = {top: 25, right: 25, bottom: 100, left: 25},
+            width = 300 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+    } else {
+        var margin = {top: 25, right: 25, bottom: 25, left: 25},
+            width = 300 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+    }
 
     svg.attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
+    
             
     var x = d3.scaleBand()
         .range([ 0, width ])
@@ -153,23 +186,45 @@ function buildBarGraph(svg) {
         .attr('stroke', '#000000');
 
     var difference = genData[tempB] / genData[tempA];
-    console.log("A%B: " + Math.floor(difference * 100));
-    return Math.floor(difference * 100);
+    var actDifference = Math.floor(difference * 100);
+    console.log("A%B: " + actDifference);
+
+    if(flag){
+        svg.append("text")
+            .attr("x", 40)
+            .attr("y", 210)
+            .text("Here we have a Bar Graph");
+
+        svg.append("text")
+            .attr("x", 25)
+            .attr("y", 230)
+            .text("The larger value A is dark gray");
+
+        svg.append("text")
+            .attr("x", 20)
+            .attr("y", 250)
+            .text("The smaller value B is light gray");
+
+        svg.append("text")
+            .attr("x", 25)
+            .attr("y", 270)
+            .text("B is " + actDifference + "% of A. Report " + actDifference + " below:");
+    }
+
+    return actDifference;
 }
 
-function buildAreaGraph(svg) {
-    var margin = {top: 25, right: 25, bottom: 25, left: 25},
-    width = 300 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+function buildAreaGraph(svg,flag) {
 
-    // append the svg object to the body of the page
-    // var svg = d3.select("#graphContainer")
-    // .append("svg")
-    //     .attr("width", width + margin.left + margin.right)
-    //     .attr("height", height + margin.top + margin.bottom)
-    // .append("g")
-    //     .attr("transform",
-    //         "translate(" + margin.left + "," + margin.top + ")");
+    if(flag){
+        var margin = {top: 25, right: 25, bottom: 100, left: 25},
+            width = 300 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+    } else {
+        var margin = {top: 25, right: 25, bottom: 25, left: 25},
+            width = 300 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+    }
 
     // Generate random data
     
@@ -252,26 +307,56 @@ function buildAreaGraph(svg) {
         )
 
     var difference = B / A;
-    console.log("A%B: " + Math.floor(difference * 100));
-    return Math.floor(difference * 100);
+    var actDifference = Math.floor(difference * 100);
+    console.log("A%B: " + actDifference);
+
+    if(flag){
+        svg.append("text")
+            .attr("x", 15)
+            .attr("y", 210)
+            .text("Here we have a Stacked Area Graph");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 225)
+            .text("The larger (dataset) at point X is dark gray");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 240)
+            .text("The smaller (dataset) at point X is light gray");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 255)
+            .text("The top color is stacked on the bottom color");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 270)
+            .text("Y value of light gray at X is " + actDifference + "% of dark gray");
+
+        svg.append("text")
+            .attr("x", 60)
+            .attr("y", 285)
+            .text("Report " + actDifference + " below:");
+    }
+    return actDifference;
 }
 
 
-function buildBubbleGraph(svg) {
-        // set the dimensions and margins of the graph
-    var margin = {top: 25, right: 25, bottom: 25, left: 25},
-    width = 300- margin.left - margin.right,
-    height = 300- margin.top - margin.bottom;
-
-    // // append the svg object to the body of the page
-    // var svg = d3.select("#my_dataviz")
-    // .append("svg")
-    // .attr("width", width + margin.left + margin.right)
-    // .attr("height", height + margin.top + margin.bottom)
-    // .append("g")
-    // .attr("transform",
-    //     "translate(" + margin.left + "," + margin.top + ")");
-
+function buildBubbleGraph(svg,flag) {
+    // set the dimensions and margins of the graph
+    
+    if(flag){
+        var margin = {top: 25, right: 25, bottom: 100, left: 25},
+            width = 300 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+    } else {
+        var margin = {top: 25, right: 25, bottom: 25, left: 25},
+            width = 300 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+    }
 
     function getRandomInt(i){
         let r = Math.floor(Math.random() * i)
@@ -281,77 +366,83 @@ function buildBubbleGraph(svg) {
         return r;
     }
 
-    data = []
-    var A;
-    var B;
+    if(!flag){
+        data = []
+        var A;
+        var B;
 
-    for (let i = 0; i < 12; i++) {
-        if(i == 0){
-            temp = {
-                "xd": getRandomInt(40),
-                "yd": getRandomInt(50),
-                "color": "A"
+        for (let i = 0; i < 10; i++) {
+            if (i == 0){
+                temp = {
+                    "xd": getRandomInt(40),
+                    "yd": getRandomInt(50),
+                    "color":"A"
+                }
+            } else if (i == 1){
+                temp = {
+                    "xd": getRandomInt(40),
+                    "yd": getRandomInt(50),
+                    "color": "A"
+                }
+                if (data[0].yd < temp.yd){
+                    data[0].color = "B"
+                    A = temp.yd;
+                    B = data[0].yd;
+                } else {
+                    temp.color ="B"
+                    B = temp.yd;
+                    A = data[0].yd;
+                }
+            } else {
+                temp = {
+                    "xd": getRandomInt(40),
+                    "yd": getRandomInt(50),
+                    "color": ""
+                }
             }
-        } else if(i == 1){
-            temp = {
-                "xd": getRandomInt(40),
-                "yd": getRandomInt(50),
-                "color": "A"
-            }
-            if(data[0].yd < temp.yd){
-                data[0].color = "B"
-                A = temp.yd;
-                B = data[0].yd;
-            }
-            else{
-                temp.color ="B"
-                B = temp.yd;
-                A = data[0].yd;
-            }
+            data[i] = temp
         }
-        else{
-            temp = {
-                "xd": getRandomInt(40),
-                "yd": getRandomInt(50),
-                "color": ""
-            }
-        }
-        data[i] = temp
+    } else {
+        data = []
+        data[0] = {"xd": 4,"yd": 40,"color": "A","text":"This is the larger bubble!"}
+        data[1] = {"xd": 4,"yd": 10,"color": "B","text":"This bubble is 25% of the other!" }
+        A = 40
+        B = 10
     }
 
     // Add X axis
     var x = d3.scaleLinear()
-    .domain([0, 40])
-    .range([ 0, width ]);
+        .domain([0, 40])
+        .range([ 0, width ]);
     svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).ticks(0));
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(0));
 
     // Add Y axis
     var y = d3.scaleLinear()
-    .domain([0, 50])
-    .range([ height, 0]);
+        .domain([0, 50])
+        .range([ height, 0]);
     svg.append("g")
-    .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y));
 
     // Add dots
     svg.append('g')
-    .selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("cx", function (d) { return x(d.xd); } )
-    .attr("cy", function (d) { return y(d.yd); } )
-    .attr("r", function (d) { return 5+(d.yd*0.2)})
-    .style("line", "black")
+        .selectAll("dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", function (d) { return x(d.xd); } )
+        .attr("cy", function (d) { return y(d.yd); } )
+        .attr("r", function (d) { return 5+(d.yd*0.2)})
+        .style("line", "black")
         .attr("fill", function (d) {
             switch(d.color){
-              case "A":
-                return "#666666";
-              case "B":
-                return "#AAAAAA";
-              default:
-                return "#FFFFFF00";
+                case "A":
+                    return "#666666";
+                case "B":
+                    return "#AAAAAA";
+                default:
+                    return "#FFFFFF00";
             }
         })
         .attr('stroke', '#000000')
@@ -360,9 +451,47 @@ function buildBubbleGraph(svg) {
         .attr('color', 'black')
         .attr('font-size', 15);
 
+    svg.selectAll(".dodo")
+        .data(data)
+        .enter()
+        .append("text")
+        // Add your code below this line
+        .text((d) => d.text)
+        .attr("x", function(d) { return x(d.xd)+10; })
+        .attr("y", function(d) { return y(d.yd)-5; })
+
     var difference = B / A;
-    console.log("A%B: " + Math.floor(difference * 100));
-    return Math.floor(difference * 100);
+    var actDifference = Math.floor(difference * 100);
+    console.log("A%B: " + actDifference);
+    
+    if(flag){
+        svg.append("text")
+            .attr("x", 30)
+            .attr("y", 210)
+            .text("Here we have a Bubble Graph");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 230)
+            .text("The dark gray point has a larger Y value/size");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 250)
+            .text("The light gray point has a smaller Y value/size");
+
+        svg.append("text")
+            .attr("x", 0)
+            .attr("y", 270)
+            .text("The value of light gray is " + actDifference + "% of the dark gray");
+
+        svg.append("text")
+            .attr("x", 60)
+            .attr("y", 290)
+            .text("Report " + actDifference + " below:");
+    }
+    
+    return actDifference;
 
 }
 
@@ -380,9 +509,12 @@ function buildNextGraph() {
     // Clear previous graph (if any) and add new svg
     d3.select('#graphContainer').html("");
     const svg = d3.select('#graphContainer').append("svg");
+    if(questionNumber > 2){
+        flag = false;
+    }
     
     // Build new graph in container and get the correct answer after it has been randomly generated
-    correctAnswer = builder(svg);
+    correctAnswer = builder(svg,flag);
     graphType = name;
 
     if (!Number.isInteger(correctAnswer)) {
