@@ -5,7 +5,7 @@ const morgan = require("morgan");
 
 const app = express();
 
-app.use(morgan("tiny"));
+app.use(morgan("[:date[iso]] :method :url :status :res[content-length] - :response-time ms"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -42,12 +42,12 @@ function saveResultsData(data, res) {
     if (!fs.existsSync(dataFile)) {
         console.log("Data file does not exist yet, creating a new file");
         // Create file and add csv header to label columns
-        const headerLine = columns.map(x => `"${x}"`).join(",") + ",\n";
+        const headerLine = columns.map(x => `"${x}"`).join(",") + ",\"serverTime\",\n";
         fs.writeFileSync(dataFile, headerLine);
     }
 
     // Use the simple approach of just dumping everything in a csv then sorting through it later
-    const csvLine = extractCSVLine(data, columns);
+    const csvLine = extractCSVLine(data, columns) + `${new Date().getTime()},`;
     console.log(`Received data line "${csvLine}" from message ${JSON.stringify(data)}`);
     fs.appendFile(dataFile, csvLine + "\n", function (err) {
         if (err) {
