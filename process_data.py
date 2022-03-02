@@ -30,8 +30,8 @@ def process():
     user1 = data[data['userId'] % 2 == 1] #reported nothing
     user2 = data[data['userId'] % 2 == 0] #reported correct answer
 
-    user1["type"] = " Feedback " + user1["graphType" ]
-    user2["type"] = " No Feedback " + user2["graphType"]
+    user1["type"] =   user1["graphType"] +" Feedback"
+    user2["type"] =  user2["graphType"] +" No Feedback"
     print(user1)
     headerList = ['type', 'error']
     f = open('error.csv', 'w')
