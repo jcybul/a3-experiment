@@ -6,10 +6,12 @@ d
 class(d)
 
 # Orientation follows the discrete axis
-ggplot(d,aes(x=error,y=factor(type))) +
-  stat_summary(data=d, fun.data = "mean_cl_boot",colour = "red", size = 0.5,geom = "pointrange")
+ggplot(d,aes(x=error,y=type)) +
+  geom_point() +
+  stat_summary( fun.data = "mean_cl_boot",colour = "Blue", size = 1,minx =0)
 
 # Orientation follows the discrete axis
 ggplot(mtcars, aes(mpg, factor(cyl))) +
   geom_point() +
   stat_summary(fun.data = "mean_cl_boot", colour = "red", size = 2)
+
