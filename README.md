@@ -45,7 +45,7 @@ This is an example of a random bubble chart where the user was supposed to compa
 
 
 ![c](img/correcy_ans.PNG)
-![c](img/Wrong_answer.png)
+![c](img/wrong_answer.png)
 
 
 Description of the technical achievements you attempted with this project.
