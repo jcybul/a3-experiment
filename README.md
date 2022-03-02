@@ -48,9 +48,9 @@ This is an example of a random bubble chart where the user was supposed to compa
 ![c](img/wrong_answer.png)
 
 As mentioned, before we hypothesized that providing feedback to the user would have a positive effect on their overall results, compared to no feedback at all. From the data we collected we can observe that for two of the three graphs our hypothesis was correct:
-**Bar Chart**: when the users had feedback on what their answers was, they had an error value of 1.12 (log based to the absolute difference) from the right answer, compared to 1.60 when no feedback was provided. 
-**Bubble Chart**: with feedback provided the user had an error value of 2.47, and with no feedback the error value was 2.73
-**Area Chart**: the area chart was the only one that had better results when no feedback was provided 3.1 compared to 3.76 when feedback was provided, we believe that this happened because the area graph is somewhat confusing on its own, so providing feedback cause the user to be more confused and provide an incorrect answer. 
+-**Bar Chart**: when the users had feedback on what their answers was, they had an error value of 1.12 (log based to the absolute difference) from the right answer, compared to 1.60 when no feedback was provided. 
+-**Bubble Chart**: with feedback provided the user had an error value of 2.47, and with no feedback the error value was 2.73
+-**Area Chart**: the area chart was the only one that had better results when no feedback was provided 3.1 compared to 3.76 when feedback was provided, we believe that this happened because the area graph is somewhat confusing on its own, so providing feedback cause the user to be more confused and provide an incorrect answer. 
 
 ![c](confidence_intervals.png)
 
