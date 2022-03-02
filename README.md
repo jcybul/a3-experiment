@@ -47,6 +47,9 @@ This is an example of a random bubble chart where the user was supposed to compa
 ![c](img/correcy_ans.PNG)
 ![c](img/wrong_answer.png)
 
+![c](confidence_intervals.png)
+![c](confidence_intervals_box.png)
+
 
 Description of the technical achievements you attempted with this project.
 Description of the design achievements you attempted with this project.
