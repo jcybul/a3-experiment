@@ -8,9 +8,11 @@ function sendResults(data) {
     // TODO: Send to correct ip
     return fetch("/api/results", {
         method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(data),
     })
-    .then(x => x.json())
     .then(console.log);
 }
 
@@ -19,23 +21,70 @@ function submitAnswer(event) {
 
     const textField = document.getElementById("answer");
 
-    sendResults({
-        answer: textField.value,
-        timestamp: new Date().getTime(),
-        userId,
-        graphType,
-        questionNumber,
-        correctAnswer,
-    });
+    if (questionNumber < 63) {
+        sendResults({
+            answer,
+            timestamp: new Date().getTime(),
+            userId,
+            graphType,
+            questionNumber,
+            correctAnswer,
+        });
+    }
 
-    buildNextGraph();
+    if (questionNumber >= 2 && questionNumber < 63) {
+        location.innerHTML = `<b>${questionNumber-2}/60<b>`;
+    
+        if (questionNumber >= 3){
+            if (!Number.isInteger(correctAnswer)) {
+                feedback.innerHTML = "<b>\u{1f620} A developer did not return a valid correct answer for this graph</b>";
+            } else if (userId % 2 == 0) {
+                const err = Math.abs(correctAnswer - answer);
+
+                if (err < 10) {
+                    feedback.innerHTML = "<b>\u{1f600} Congratulations, you were within 10% of the correct answer!<b>";
+                    numberCorrect +=1;
+                } else {
+                    feedback.innerHTML = `<b>\u2639 You were ${err}% away from the correct answer of ${correctAnswer}%<b>`;
+                }
+            } else {
+                const err = Math.abs(correctAnswer - answer);
+
+                if (err < 10) {
+                    numberCorrect +=1;
+                } 
+            }
+        }
+    
+    }
+
+    textField.value = ""; 
+
+    if (questionNumber < 63) {
+        buildNextGraph();
+    } else if (questionNumber === 63) {
+        share.innerHTML = "Copy Results!";
+        document.body.appendChild(share);
+        share.addEventListener("click", function () {
+            const copyText = "I guessed " + numberCorrect + "/60 correct! " +
+            "Link: https://meggitt.dev";
+            navigator.clipboard.writeText(copyText);
+        })
+        document.getElementById("graphContainer").outerHTML = "";
+        document.getElementById("answer").outerHTML = "";
+        document.getElementById("submit").outerHTML = "";
+        feedback.innerHTML = `<b>Thank you for participating! Your total score was ${numberCorrect}/60<b>`;
+        questionNumber++;
+    } else {
+        feedback.innerHTML = `<b>Thank you for participating! Your total score was ${numberCorrect}/60<b>`;
+    }
+    
 }
 
 window.onload = function() {
     const submitButton = document.getElementById("submit");
     submitButton.onclick = submitAnswer;
 
-    console.log("Running window.onload!");
     buildNextGraph();
 }
 

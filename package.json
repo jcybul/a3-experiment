@@ -4,10 +4,12 @@
     "description": "",
     "author": "team-name",
     "scripts": {
-      "start": "node src/app.js"
+        "start": "node src/server.js"
     },
     "dependencies": {
-      "mime": "^2.4.4"
+        "body-parser": "^1.19.2",
+        "express": "^4.17.3",
+        "morgan": "^1.10.0",
+        "sanitize-filename": "^1.6.3"
     }
-  }
-  
+}
