@@ -10,9 +10,9 @@ For our experiment, we wanted to test how immediate feedback would affect the us
 
 The three data visualization types that were selected to experiment with were:
 
--Bar Chart
--Stacked Area Chart
--Bubble Chart
+- Bar Chart
+- Stacked Area Chart
+- Bubble Chart
 
 
 The bar chart was used in Cleveland and McGill's original experiment and proved to have an error on the smaller side, so it was included in this experiment as well. The stacked area chart was a more interesting way of comparing areas that were stacked on top of each other than a stacked bar chart. We also wanted to include a slightly more difficult chart to analyze and decided to include the bubble chart. Based on the results from Cleveland and McGill’s experiment and others similar to theirs, this kind of graph resulted in higher errors. 
