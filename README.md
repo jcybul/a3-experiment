@@ -2,8 +2,8 @@ Assignment 3 - Replicating a Classic Experiment
 ===
 README
 Working link to the experiment hosted on gh-pages or some other site.
-https://meggitt.dev/ 
-http://jcybul.github.io/a3-experiment/public/index.html
+* https://meggitt.dev/ 
+* http://jcybul.github.io/a3-experiment/public/index.html
 
 - Concise description and screenshot of your experiment.
 For our experiment, we wanted to test how immediate feedback would affect the user's response. We created two groups of users, one serving as the control with no feedback, and one with immediate feedback after each response. We were interested to see if the immediate feedback would have a positive or negative effect on the user’s guesses.
@@ -14,16 +14,16 @@ For our experiment, we wanted to test how immediate feedback would affect the us
 
 ![c](img/p2.png)
 
-This is what the stacked area graph looked like. We selected only two area sections to make the comparison easier, and instructed the user to compare the areas at line “X”. The smaller area was always the lighter gray color. 
+-This is what the stacked area graph looked like. We selected only two area sections to make the comparison easier, and instructed the user to compare the areas at line “X”. The smaller area was always the lighter gray color. 
 ![c](img/p3.png)
 
-This is what the instruction page for the bubble graph looks like. There were only two bubbles displayed and the user was given the correct answer. The bubbles are indicated by color where the lighter gray was also the smaller of the two. 
+-This is what the instruction page for the bubble graph looks like. There were only two bubbles displayed and the user was given the correct answer. The bubbles are indicated by color where the lighter gray was also the smaller of the two. 
 ![c](img/p4.png)
-This is an example of a random bar graph in which a user was supposed to compare B with A. 
+-This is an example of a random bar graph in which a user was supposed to compare B with A. 
 ![c](img/p5.png)
-This is an example of a random stacked area chart at which the user was supposed to compare the lighter gray section with the darker gray. 
+-This is an example of a random stacked area chart at which the user was supposed to compare the lighter gray section with the darker gray. 
 ![c](img/p6.png)
-This is an example of a random bubble chart where the user was supposed to compare the smaller bubble with the bigger one.
+-This is an example of a random bubble chart where the user was supposed to compare the smaller bubble with the bigger one.
 ![c](img/correcy_ans.PNG)
 ![c](img/Wrong_answer.png)
 
