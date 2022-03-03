@@ -60,11 +60,13 @@ As mentioned, before we hypothesized that providing feedback to the user would h
 - **Bubble Chart**: with feedback provided the user had an error value of 2.47, and with no feedback the error value was 2.73
 - **Area Chart**: the area chart was the only one that had better results when no feedback was provided 3.1 compared to 3.76 when feedback was provided, we believe that this happened because the area graph is somewhat confusing on its own, so providing feedback cause the user to be more confused and provide an incorrect answer. 
 
+Based on over 20 complete surveys, we have created a 95% confidence interval mean bootstrap based on graph type and feedback. Visually analyzing the difference between graphs and having feedback or not having feedback:
+
 ![c](confidence_intervals.png)
 
 ![c](confidence_intervals_box.png)
 
-We have created the 95% confidence interval for mean bootstrap based on bar type and feedback, to visually analyze what the difference of having feedback and not having feedback	was: 
+The idea behind feedback improving scores is that it would allow the participant to improve their mistakes. As the participant proceeds with the survey, they should learn how better to estimate the differences in each graph. Without feedback, there's no way for the participant to realize they may be over or underestimating the value or answering the question entirely wrong. The complication in this hypothesis comes with the Area chart. The area chart is unbelievably complicated when compared to the others. Many participants reported questions, confusion, and in some cases, were genuinely overwhelmed and stressed out about the Area chart and how the reported answers didn't make any sense. This frustration could be what resulted in the loss of accuracy for reported participants as the actual value may have made them second guess themselves when they were actually on the right track.
 
 Technical Achievements
 ---
