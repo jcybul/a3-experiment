@@ -68,6 +68,8 @@ We have created the 95% confidence interval for mean bootstrap based on bar type
 
 Technical Achievements
 ---
+There were several technical achievements that we were able to accomplish during this project. We created a tutorial for the users so that they would be able to understand the three types of visualizations we selected before beginning the scored part of the experiment. These were not counted towards the total score.
+
 
 Design Achievements
 ---
